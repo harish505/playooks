@@ -1,0 +1,51 @@
+---
+- name: Check CPU and RAM utilization and trigger Email
+  hosts: web-server
+  become: yes
+  tasks:
+  - name: Transfer executable shellscript
+    copy:
+      src:  /home/ansadmin/shellscript/test.sh
+      dest: /opt/test.sh
+      mode: 0775
+
+  - name: creating a file
+    file:
+      path: /home/ansadmin/metric-log.txt
+      state: touch
+      mode: u+rw,g-wx,o-rwx
+	  
+  - name: Execute shellscript
+    ansible.builtin.shell: /opt/test.sh
+    args:
+      executable: /bin/bash
+	  register: cpu_result
+
+  - name: Display the OutPut
+	  debug: 
+	    msg: "CPU Utilization is {{ cpu_result }}"
+	  
+  - name: store file into /tmp/fetched in server from nodes
+    ansible.builtin.fetch:
+      src: /home/ansadmin/metric-log.txt
+      dest: /tmp/fetched
+
+  - name: Create a zip archive of /path/to/foo
+    archive:
+      path: /tmp/fetched
+      dest: /tmp/fetched.zip
+      format: zip
+    delegate_to: localhost	  
+	
+- name: Sending an e-mail Gmail SMTP servers
+    mail:
+      host: smtp.gmail.com
+      port: 587
+      username: rajula.ramsb2@gmail.com
+      password: twvrybjncjmdueqq
+      to:
+        - rajula.ramsb2@gmail.com
+      subject: Ansible-report
+      body: system has been successfully provisioned.
+      attach: /tmp/fetched.zip
+    delegate_to: localhost

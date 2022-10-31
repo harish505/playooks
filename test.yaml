@@ -1,0 +1,21 @@
+---
+- name: Check CPU and RAM utilization and trigger Email
+  hosts: web-server
+  become: yes
+  vars:
+  tasks:
+  - name: Transfer executable shellscript
+    copy:
+      src: /home/ansadmin/shellscript/test.sh
+      dest: /opt/tesh.sh
+      mode: 0775
+  - name: creating a file 
+    file:
+      path: /home/ansadmin/metric-log.txt
+      state: touch
+  - name: Execute shellscript
+    ansible.builtin.shell: /opt/test.sh > /home/ansadmin/metric-log.txt
+    args:
+      executable: /bin/bash
+  
+  

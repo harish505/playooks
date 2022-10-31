@@ -1,0 +1,16 @@
+---
+- name: Setup server
+  hosts: web-server
+  tasks:
+
+- name: test
+  shell: free -m
+  register: xyz
+
+- name: Print service status
+  debug:
+  msg: "{{ansible_memory_mb.real}}"
+
+- name: Print service status
+  debug:
+  msg: "{{xyz.stdout.split('\n')}}"
